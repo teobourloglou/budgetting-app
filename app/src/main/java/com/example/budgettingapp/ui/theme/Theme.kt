@@ -15,26 +15,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-        primary = Purple80,
-        secondary = PurpleGrey80,
-        tertiary = Pink80
+private val DarkColors = darkColorScheme(
+    primary = nthng_theme_primary,
+    onPrimary = nthng_theme_on_primary,
+    secondary = nthng_theme_secondary,
+    onSecondary = nthng_theme_on_secondary,
+    tertiary = nthng_theme_tertiary,
+    onTertiary = nthng_theme_on_tertiary,
+    background = nthng_theme_background,
+    onBackground = nthng_theme_on_background,
+    surface = nthng_theme_background,
+    onSurface = nthng_theme_on_background,
+    error = nthng_theme_primary,
+    onError = nthng_theme_on_primary,
+    outline = nthng_theme_outline
 )
 
-private val LightColorScheme = lightColorScheme(
-        primary = Purple40,
-        secondary = PurpleGrey40,
-        tertiary = Pink40
+private val LightColors = lightColorScheme(
+    primary = nthng_theme_primary,
+    onPrimary = nthng_theme_on_primary,
+    secondary = nthng_theme_secondary,
+    onSecondary = nthng_theme_on_secondary,
+    tertiary = nthng_theme_tertiary,
+    onTertiary = nthng_theme_on_tertiary,
+    background = nthng_theme_background,
+    onBackground = nthng_theme_on_background,
+    surface = nthng_theme_background,
+    onSurface = nthng_theme_on_background,
+    error = nthng_theme_primary,
+    onError = nthng_theme_on_primary,
+    outline = nthng_theme_outline
 
-        /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
@@ -45,13 +56,13 @@ fun BudgettingAppTheme(
         content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> DarkColors
+        else -> LightColors
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
