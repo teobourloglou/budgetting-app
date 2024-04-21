@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
+import com.example.budgettingapp.ui.components.DrawerContent
 import com.example.budgettingapp.ui.components.TopBar
 import com.example.budgettingapp.ui.theme.BudgettingAppTheme
 
@@ -54,64 +55,28 @@ import com.example.budgettingapp.ui.theme.BudgettingAppTheme
 fun Home(amount: Int, amountCents: Int, navController: NavController, modifier: Modifier = Modifier) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text("Drawer Title")
-                Divider()
-                NavigationDrawerItem(
-                    label = { Text(text = "Home") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(route = Screen.Home.route)
-                    }
-                )
-                Divider()
-                NavigationDrawerItem(
-                    label = { Text(text = "Drawer Item") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(route = Screen.Expenses.route)
-                    }
-                )
-            }
-        }
+        drawerContent = { DrawerContent(navController) }
     ) {
-        Scaffold(
-            topBar = {
-                TopBar(scope = scope, drawerState = drawerState)
-            }
-        ) { innerPadding ->
-            Column (
-                verticalArrangement = Arrangement.SpaceEvenly,
+        ScreenContent(scope, drawerState, modifier) {
+            var selected by remember { mutableIntStateOf(0) }
+            MoneyAmount(amount, amountCents, modifier = Modifier)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(
+                    space = 15.dp,
+                    alignment = Alignment.Bottom
+                ),
                 modifier = modifier
                     .padding(8.dp)
-                    .padding(innerPadding)
-                    .fillMaxHeight()
             ) {
-                var selected by remember { mutableIntStateOf(0) }
-                MoneyAmount(amount, amountCents, modifier = Modifier)
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 15.dp,
-                        alignment = Alignment.Bottom
-                    ),
-                    modifier = modifier
-                        .padding(8.dp)
-                        .padding(innerPadding)
-                        .weight(1f)
-                ) {
-                    TimeSelector(
-                        modifier = modifier,
-                        selected = selected,
-                        onTimeSelected = { newSelected -> selected = newSelected }
-                    )
-                    ActionGroup()
-                }
+                TimeSelector(
+                    modifier = modifier,
+                    selected = selected,
+                    onTimeSelected = { newSelected -> selected = newSelected }
+                )
+                ActionGroup()
             }
         }
     }

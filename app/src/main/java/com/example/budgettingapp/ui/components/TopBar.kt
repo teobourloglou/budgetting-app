@@ -25,6 +25,11 @@ import com.example.budgettingapp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Composable
+fun TopBarWithDrawer(scope: CoroutineScope, drawerState: DrawerState) {
+    TopBar(scope = scope, drawerState = drawerState)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(modifier: Modifier = Modifier, scope: CoroutineScope, drawerState: DrawerState) {
