@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.budgettingapp.ui.AddExpense
 import com.example.budgettingapp.ui.Expenses
 import com.example.budgettingapp.ui.Home
 
@@ -18,12 +19,21 @@ fun SetupNavGraph(
         composable(
             route = Screen.Home.route
         ) {
-            Home(300, 0, navController)
+            Home(
+                amount = 300,
+                amountCents = 0,
+                navController = navController
+            )
         }
         composable(
             route = Screen.Expenses.route
         ) {
             Expenses(navController)
+        }
+        composable(
+            route = Screen.AddExpense.route
+        ) {
+            AddExpense(navController)
         }
     }
 }

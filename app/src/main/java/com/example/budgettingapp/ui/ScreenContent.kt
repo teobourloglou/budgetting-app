@@ -17,10 +17,17 @@ public fun ScreenContent(
     scope: CoroutineScope,
     drawerState: DrawerState,
     modifier: Modifier,
+    title: String,
     content: @Composable () -> Unit
 ) {
     Scaffold(
-        topBar = { TopBarWithDrawer(scope = scope, drawerState = drawerState) }
+        topBar = {
+            TopBarWithDrawer(
+                scope = scope,
+                drawerState = drawerState,
+                title = title
+            )
+        }
     ) { innerPadding ->
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,

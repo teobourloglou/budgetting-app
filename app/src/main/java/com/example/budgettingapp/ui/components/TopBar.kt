@@ -26,13 +26,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun TopBarWithDrawer(scope: CoroutineScope, drawerState: DrawerState) {
-    TopBar(scope = scope, drawerState = drawerState)
+fun TopBarWithDrawer(scope: CoroutineScope, drawerState: DrawerState, title: String) {
+    TopBar(
+        scope = scope,
+        drawerState = drawerState,
+        title = title
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(modifier: Modifier = Modifier, scope: CoroutineScope, drawerState: DrawerState) {
+fun TopBar(scope: CoroutineScope, drawerState: DrawerState, title: String, modifier: Modifier = Modifier) {
     CenterAlignedTopAppBar(
         title = {
             Row(
@@ -47,8 +51,7 @@ fun TopBar(modifier: Modifier = Modifier, scope: CoroutineScope, drawerState: Dr
                                 open()
                             }
                         }
-                    },
-                    modifier = modifier
+                    }
                 ){
                     Icon(
                         imageVector = Icons.Outlined.FormatListBulleted,
@@ -58,14 +61,13 @@ fun TopBar(modifier: Modifier = Modifier, scope: CoroutineScope, drawerState: Dr
                     )
                 }
                 Text(
-                    text = stringResource(R.string.overview),
+                    text = title,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.outline,
                     fontSize = 16.sp
                 )
                 IconButton(
-                    onClick = { /*TODO*/ },
-                    modifier = modifier
+                    onClick = { /*TODO*/ }
                 ){
                     Icon(
                         imageVector = Icons.Outlined.Settings,
@@ -76,6 +78,5 @@ fun TopBar(modifier: Modifier = Modifier, scope: CoroutineScope, drawerState: Dr
                 }
             }
         },
-        modifier = modifier
     )
 }
