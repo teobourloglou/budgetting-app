@@ -1,4 +1,4 @@
-package com.example.budgettingapp.data
+package com.example.budgettingapp.data.expense
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,6 +9,5 @@ data class Expense (
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val label: String,
-    val amount: Double,
-    val date: Date
+    val amount: String
 )

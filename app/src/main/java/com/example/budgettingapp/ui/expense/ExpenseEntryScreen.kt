@@ -1,10 +1,8 @@
-package com.example.budgettingapp.ui
+package com.example.budgettingapp.ui.expense
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,35 +15,35 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
+import com.example.budgettingapp.data.expense.ExpenseEvent
+import com.example.budgettingapp.data.expense.ExpenseState
+import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
-import com.example.budgettingapp.ui.theme.BudgettingAppTheme
 
 @Composable
-fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
+fun ExpenseEntry(
+    navController: NavController,
+    state: ExpenseState,
+    onEvent: (ExpenseEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -59,9 +57,6 @@ fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
             title = stringResource(R.string.add_expense),
             modifier = modifier.padding(5.dp)
         ) {
-            var labelText by remember { mutableStateOf("") }
-            var amountText by remember { mutableStateOf("") }
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(
                     space = 40.dp,
@@ -76,8 +71,10 @@ fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
             )
             {
                 TextField(
-                    value = labelText,
-                    onValueChange = { labelText = it },
+                    value = state.label,
+                    onValueChange = {
+                        onEvent(ExpenseEvent.SetLabel(it))
+                    },
                     textStyle = TextStyle.Default.copy(
                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                         fontSize = 16.sp
@@ -106,8 +103,10 @@ fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
                     }
                 )
                 TextField(
-                    value = amountText,
-                    onValueChange = { amountText = it },
+                    value = state.amount,
+                    onValueChange = {
+                        onEvent(ExpenseEvent.SetAmount(it))
+                    },
                     textStyle = TextStyle.Default.copy(
                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                         fontSize = 16.sp
@@ -145,7 +144,11 @@ fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
                     modifier = modifier.weight(2f)
                 ) {
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            onEvent(ExpenseEvent.SaveExpense).also {
+                                navController.navigate(route = Screen.Expenses.route)
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
                         modifier = modifier.fillMaxWidth()
                     ) {
@@ -173,15 +176,15 @@ fun AddExpense(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun AddExpensePreview() {
-    BudgettingAppTheme {
-        Surface (
-            color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            AddExpense(navController = rememberNavController())
-        }
-    }
-}
+//@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Composable
+//fun AddExpensePreview() {
+//    BudgettingAppTheme {
+//        Surface (
+//            color = MaterialTheme.colorScheme.background,
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            ExpenseEntry(navController = rememberNavController())
+//        }
+//    }
+//}

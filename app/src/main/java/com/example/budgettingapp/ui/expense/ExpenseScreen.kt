@@ -1,19 +1,25 @@
-package com.example.budgettingapp.ui
+package com.example.budgettingapp.ui.expense
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -22,19 +28,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
+import com.example.budgettingapp.data.expense.Expense
+import com.example.budgettingapp.data.expense.ExpenseEvent
+import com.example.budgettingapp.data.expense.ExpenseState
+import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
-import com.example.budgettingapp.ui.theme.BudgettingAppTheme
+import com.example.budgettingapp.ui.components.ExpenseRow
 
 
 @Composable
-fun Expenses(navController: NavController, modifier: Modifier = Modifier) {
+fun Expenses(
+    navController: NavController,
+    state: ExpenseState,
+    onEvent: (ExpenseEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -84,7 +97,7 @@ fun Expenses(navController: NavController, modifier: Modifier = Modifier) {
                     }
                     Button(
                         onClick = {
-                            navController.navigate(route = Screen.AddExpense.route)
+                            navController.navigate(route = Screen.ExpenseEntry.route)
                         },
                         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
                         modifier = modifier.weight(1f)
@@ -98,35 +111,27 @@ fun Expenses(navController: NavController, modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(
-                        space = 15.dp,
-                        alignment = Alignment.CenterVertically
-                    ),
-                    modifier = modifier.fillMaxSize()
-                ) {
+                if (state.expenses.isEmpty()) {
                     Text(
                         text = "No data yet",
                         modifier = modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                     )
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 15.dp,
+                            alignment = Alignment.Top
+                        ),
+                        modifier = modifier.fillMaxSize()
+                    ) {
+                        items(state.expenses) { expense ->
+                            ExpenseRow(expense = expense) {}
+                        }
+                    }
                 }
             }
-        }
-    }
-}
-
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun ExpensesPreview() {
-    BudgettingAppTheme {
-        Surface (
-            color = MaterialTheme.colorScheme.background,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Expenses(navController = rememberNavController())
         }
     }
 }

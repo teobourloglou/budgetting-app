@@ -215,7 +215,7 @@ fun ActionGroup(modifier: Modifier = Modifier, navController: NavController) {
         ) {
             Button(
                 onClick = {
-                    navController.navigate(route = Screen.AddExpense.route)
+                    navController.navigate(route = Screen.ExpenseEntry.route)
                 },
                 modifier = modifier
                     .fillMaxWidth()

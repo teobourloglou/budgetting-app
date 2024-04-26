@@ -4,13 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.budgettingapp.ui.AddExpense
-import com.example.budgettingapp.ui.Expenses
+import com.example.budgettingapp.data.expense.ExpenseEvent
+import com.example.budgettingapp.data.expense.ExpenseState
+import com.example.budgettingapp.ui.expense.Expenses
 import com.example.budgettingapp.ui.Home
+import com.example.budgettingapp.ui.expense.ExpenseEntry
 
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    state: ExpenseState,
+    onEvent: (ExpenseEvent) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -28,12 +32,20 @@ fun SetupNavGraph(
         composable(
             route = Screen.Expenses.route
         ) {
-            Expenses(navController)
+            Expenses(
+                navController,
+                state,
+                onEvent
+            )
         }
         composable(
-            route = Screen.AddExpense.route
+            route = Screen.ExpenseEntry.route
         ) {
-            AddExpense(navController)
+            ExpenseEntry(
+                navController,
+                state,
+                onEvent
+            )
         }
     }
 }

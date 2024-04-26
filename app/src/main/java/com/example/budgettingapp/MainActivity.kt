@@ -5,14 +5,17 @@ package com.example.budgettingapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.budgettingapp.ui.Home
+import androidx.room.Room
+import com.example.budgettingapp.data.expense.ExpenseDatabase
+import com.example.budgettingapp.ui.expense.ExpenseViewModel
 import com.example.budgettingapp.ui.theme.BudgettingAppTheme
 
 
@@ -20,14 +23,37 @@ class MainActivity : ComponentActivity() {
 
     lateinit var navController: NavHostController
 
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            ExpenseDatabase::class.java,
+            "expenses.db"
+        ).build()
+    }
+
+    private val viewModel by viewModels<ExpenseViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ExpenseViewModel(db.dao()) as T
+                }
+            }
+        }
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             BudgettingAppTheme {
+                val state by viewModel.state.collectAsState()
                 navController = rememberNavController()
-                SetupNavGraph(navController = navController)
+
+                SetupNavGraph(
+                    navController = navController,
+                    state = state,
+                    onEvent = viewModel::onEvent
+                )
             }
         }
     }
 }
-
