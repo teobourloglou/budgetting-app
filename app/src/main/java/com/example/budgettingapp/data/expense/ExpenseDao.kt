@@ -19,4 +19,7 @@ interface ExpenseDao {
 
     @Query("SELECT * from expenses")
     fun getAllExpenses(): Flow<List<Expense>>
+
+    @Query("SELECT * from expenses ORDER BY date")
+    fun getAllExpensesByDate(): Flow<List<Expense>>
 }

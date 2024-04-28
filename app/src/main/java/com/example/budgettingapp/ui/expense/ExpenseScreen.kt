@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +39,6 @@ import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
-import com.example.budgettingapp.ui.components.ExpenseRow
 
 
 @Composable
@@ -126,8 +126,60 @@ fun Expenses(
                         ),
                         modifier = modifier.fillMaxSize()
                     ) {
+                        var previousDate : String = ""
                         items(state.expenses) { expense ->
-                            ExpenseRow(expense = expense) {}
+
+                            if (previousDate != expense.date) {
+                                Row() {
+                                    Text(expense.date)
+                                }
+                            }
+                            previousDate = expense.date
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        shape = RoundedCornerShape(15.dp)
+                                    )
+                                    .padding(5.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .weight(1f)
+                                ) {
+                                    Text(
+                                        text = expense.amount,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        fontSize = 20.sp
+                                    )
+                                    Text(
+                                        text = expense.label,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        fontSize = 14.sp,
+                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily
+                                    )
+                                    Text(
+                                        text = expense.date,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        fontSize = 14.sp,
+                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    onEvent(ExpenseEvent.DeleteExpense(expense))
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Clear,
+                                        contentDescription = "Delete expense",
+                                        tint = MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }

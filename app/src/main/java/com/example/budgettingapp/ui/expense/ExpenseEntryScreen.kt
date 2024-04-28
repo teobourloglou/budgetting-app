@@ -1,17 +1,22 @@
 package com.example.budgettingapp.ui.expense
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
@@ -20,6 +25,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,11 +39,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
+import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpenseEntry(
     navController: NavController,
@@ -57,6 +73,8 @@ fun ExpenseEntry(
             title = stringResource(R.string.add_expense),
             modifier = modifier.padding(5.dp)
         ) {
+            val date = remember { mutableStateOf(LocalDate.now()) }
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(
                     space = 40.dp,
@@ -98,7 +116,7 @@ fun ExpenseEntry(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Outlined.Label,
-                            contentDescription = "Amount"
+                            contentDescription = "Label"
                         )
                     }
                 )
@@ -134,6 +152,13 @@ fun ExpenseEntry(
                           )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                CustomDatePicker(
+                    value = state.date,
+                    onValueChange = {
+                        date.value = it
+                        ExpenseEvent.SetDate(date.value.toString())
+                    }
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
@@ -176,15 +201,64 @@ fun ExpenseEntry(
     }
 }
 
-//@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-//@Composable
-//fun AddExpensePreview() {
-//    BudgettingAppTheme {
-//        Surface (
-//            color = MaterialTheme.colorScheme.background,
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            ExpenseEntry(navController = rememberNavController())
-//        }
-//    }
-//}
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDatePicker(
+    value: String,
+    onValueChange: (LocalDate) -> Unit
+) {
+
+    val open = remember { mutableStateOf(false)}
+
+    if (open.value) {
+        CalendarDialog(
+            state = rememberUseCaseState(visible = true, true, onCloseRequest = { open.value = false } ),
+            config = CalendarConfig(
+                yearSelection = true,
+                style = CalendarStyle.MONTH,
+            ),
+            selection = CalendarSelection.Date(
+                selectedDate = LocalDate.parse(value, DateTimeFormatter.ISO_DATE)
+            ) { newDate ->
+                onValueChange(newDate)
+            },
+        )
+    }
+
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+            open.value = true
+        },
+        enabled = false,
+        value = value.format(DateTimeFormatter.ISO_DATE) ,
+        onValueChange = {},
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledBorderColor = MaterialTheme.colorScheme.outline,
+            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.CalendarToday,
+                contentDescription = "Date"
+            )
+        },
+        textStyle = TextStyle.Default.copy(
+            fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+            fontSize = 16.sp
+        ),
+        label = {
+            Text(
+                text = "Date",
+                modifier = Modifier.background(Color.Transparent),
+                fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+            )
+        }
+    )
+}

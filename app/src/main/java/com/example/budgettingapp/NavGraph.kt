@@ -1,5 +1,7 @@
 package com.example.budgettingapp
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -10,6 +12,7 @@ import com.example.budgettingapp.ui.expense.Expenses
 import com.example.budgettingapp.ui.Home
 import com.example.budgettingapp.ui.expense.ExpenseEntry
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
@@ -44,7 +47,7 @@ fun SetupNavGraph(
             ExpenseEntry(
                 navController,
                 state,
-                onEvent
+                onEvent,
             )
         }
     }

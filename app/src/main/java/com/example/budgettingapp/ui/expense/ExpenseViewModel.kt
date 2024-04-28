@@ -1,5 +1,7 @@
 package com.example.budgettingapp.ui.expense
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.budgettingapp.data.expense.Expense
@@ -16,13 +18,16 @@ import kotlinx.coroutines.launch
 class ExpenseViewModel(
     private val dao: ExpenseDao
 ): ViewModel() {
+    @RequiresApi(Build.VERSION_CODES.O)
     private val _state = MutableStateFlow(ExpenseState())
-    private val _expenses = dao.getAllExpenses().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _expenses = dao.getAllExpensesByDate().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    @RequiresApi(Build.VERSION_CODES.O)
     val state = combine(_state, _expenses) { state, expenses ->
         state.copy(
             expenses = expenses
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExpenseState())
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: ExpenseEvent) {
         when(event) {
             is ExpenseEvent.DeleteExpense -> {
@@ -34,6 +39,7 @@ class ExpenseViewModel(
             ExpenseEvent.SaveExpense -> {
                 val label = state.value.label
                 val amount = state.value.amount
+                val date = state.value.date
 
                 if (label.isBlank() || amount.isBlank()) {
                     return
@@ -41,14 +47,16 @@ class ExpenseViewModel(
 
                 val expense = Expense(
                     label = label,
-                    amount = amount
+                    amount = amount,
+                    date = date
                 )
                 viewModelScope.launch {
                     dao.upsertExpense(expense)
                 }
                 _state.update { it.copy(
                     label = "",
-                    amount = ""
+                    amount = "",
+                    date = ""
                 ) }
             }
 
@@ -61,6 +69,12 @@ class ExpenseViewModel(
             is ExpenseEvent.SetAmount -> {
                 _state.update { it.copy(
                     amount = event.amount
+                ) }
+            }
+
+            is ExpenseEvent.SetDate -> {
+                _state.update { it.copy(
+                    date = event.date
                 ) }
             }
         }
