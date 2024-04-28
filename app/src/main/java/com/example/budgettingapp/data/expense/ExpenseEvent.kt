@@ -7,4 +7,5 @@ sealed interface ExpenseEvent {
     data class SetAmount(val amount: String): ExpenseEvent
     data class SetDate(val date: String): ExpenseEvent
     data class DeleteExpense(val expense: Expense): ExpenseEvent
+    data class UpdateExpense(val expense: Expense): ExpenseEvent
 }

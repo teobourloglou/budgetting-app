@@ -60,6 +60,12 @@ class ExpenseViewModel(
                 ) }
             }
 
+            is ExpenseEvent.UpdateExpense -> {
+                viewModelScope.launch {
+                    dao.upsertExpense(event.expense)
+                }
+            }
+
             is ExpenseEvent.SetLabel -> {
                 _state.update { it.copy(
                     label = event.label
