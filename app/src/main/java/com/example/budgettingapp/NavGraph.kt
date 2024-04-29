@@ -27,9 +27,9 @@ fun SetupNavGraph(
             route = Screen.Home.route
         ) {
             Home(
-                amount = 300,
-                amountCents = 0,
-                navController = navController
+                navController = navController,
+                state = state,
+                onEvent = onEvent
             )
         }
         composable(

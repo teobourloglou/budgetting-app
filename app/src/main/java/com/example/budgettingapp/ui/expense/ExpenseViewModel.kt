@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 class ExpenseViewModel(
     private val dao: ExpenseDao
@@ -56,7 +60,7 @@ class ExpenseViewModel(
                 _state.update { it.copy(
                     label = "",
                     amount = "",
-                    date = ""
+                    date = LocalDate.now().toString()
                 ) }
             }
 

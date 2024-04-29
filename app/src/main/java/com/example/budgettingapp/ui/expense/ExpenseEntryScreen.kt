@@ -42,6 +42,7 @@ import com.example.budgettingapp.Screen
 import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
+import com.example.budgettingapp.data.expense.currentDate
 import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -153,13 +154,48 @@ fun ExpenseEntry(
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                CustomDatePicker(
+                TextField(
                     value = state.date,
                     onValueChange = {
-                        date.value = it
-                        ExpenseEvent.SetDate(date.value.toString())
+                        onEvent(ExpenseEvent.SetDate(it))
+                    },
+                    textStyle = TextStyle.Default.copy(
+                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+                        fontSize = 16.sp
+                    ),
+                    label = {
+                        Text(
+                            text = "Date",
+                            modifier = modifier.background(Color.Transparent),
+                            fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedContainerColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    leadingIcon = {
+                          Icon(
+                              imageVector = Icons.Outlined.CalendarToday,
+                              contentDescription = "Date"
+                          )
+                    },
+                    placeholder = {
+                        Text(text = "yyyy-MM-dd")
                     }
                 )
+//                CustomDatePicker(
+//                    value = state.date,
+//                    onValueChange = {
+//                        date.value = it
+//                        ExpenseEvent.SetDate(date.value.toString())
+//                    }
+//                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
                         space = 5.dp,
@@ -230,8 +266,8 @@ fun CustomDatePicker(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-            open.value = true
-        },
+                open.value = true
+            },
         enabled = false,
         value = value.format(DateTimeFormatter.ISO_DATE) ,
         onValueChange = {},
