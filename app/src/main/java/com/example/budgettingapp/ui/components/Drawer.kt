@@ -52,5 +52,18 @@ fun DrawerContent(navController: NavController) {
             },
             modifier = Modifier.padding(10.dp)
         )
+        NavigationDrawerItem(
+            label = {
+                Text(
+                    text = "Categories",
+                    fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+                )
+            },
+            selected = false,
+            onClick = {
+                navController.navigate(route = Screen.Categories.route)
+            },
+            modifier = Modifier.padding(10.dp)
+        )
     }
 }

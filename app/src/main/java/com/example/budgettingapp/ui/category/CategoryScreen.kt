@@ -1,5 +1,6 @@
-package com.example.budgettingapp.ui.expense
+package com.example.budgettingapp.ui.category
 
+import com.example.budgettingapp.data.category.Category
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -16,12 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Label
-import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
@@ -46,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +51,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
-import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.ScreenContent
@@ -63,7 +59,7 @@ import com.example.budgettingapp.ui.components.DrawerContent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Expenses(
+fun Categories(
     navController: NavController,
     state: ExpenseState,
     onEvent: (ExpenseEvent) -> Unit,
@@ -93,7 +89,7 @@ fun Expenses(
             )
             {
                 Text(
-                    text = stringResource(R.string.expenses),
+                    text = stringResource(R.string.categories),
                     fontSize = 26.sp,
                     modifier = modifier.padding(bottom = 10.dp)
                 )
@@ -121,13 +117,13 @@ fun Expenses(
                     }
                     Button(
                         onClick = {
-                            navController.navigate(route = Screen.ExpenseEntry.route)
+                            navController.navigate(route = Screen.CategoryEntry.route)
                         },
                         colors = ButtonDefaults.buttonColors(colorScheme.tertiary),
                         modifier = modifier.weight(1f)
                     ) {
                         Text(
-                            text = stringResource(R.string.add_expense),
+                            text = stringResource(R.string.add_category),
                             color = colorScheme.onTertiary,
                             softWrap = false,
                             fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
@@ -135,13 +131,10 @@ fun Expenses(
                         )
                     }
                 }
-                var expenseId by remember { mutableIntStateOf(0) }
-                var label by remember { mutableStateOf("") }
-                var amount by remember { mutableStateOf("") }
-                var date by remember { mutableStateOf("") }
-                var previousDate by remember { mutableStateOf("") }
+                var categoryId by remember { mutableIntStateOf(0) }
+                var name by remember { mutableStateOf("") }
 
-                if (state.expenses.isEmpty()) {
+                if (state.categories.isEmpty()) {
                     Text(
                         text = stringResource(R.string.no_data),
                         modifier = modifier.fillMaxSize(),
@@ -157,17 +150,7 @@ fun Expenses(
                         modifier = modifier.fillMaxSize()
                     ) {
 
-                        items(state.expenses) { expense ->
-
-                            if (previousDate != expense.date) {
-                                Row(
-                                    modifier = Modifier.padding(0.dp, 5.dp)
-                                ) {
-                                    Text(expense.date)
-                                }
-                            }
-                            previousDate = expense.date
-
+                        items(state.categories) { category ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -178,10 +161,8 @@ fun Expenses(
                                     .padding(5.dp)
                                     .fillMaxWidth()
                                     .clickable {
-                                        expenseId = expense.id
-                                        label = expense.label
-                                        amount = expense.amount
-                                        date = expense.date
+                                        categoryId = category.id
+                                        name = category.name
                                         showDialog.value = true
                                     }
                             ) {
@@ -191,23 +172,17 @@ fun Expenses(
                                         .weight(1f)
                                 ) {
                                     Text(
-                                        text = expense.amount,
+                                        text = category.name,
                                         color = colorScheme.outline,
                                         fontSize = 20.sp
                                     )
-                                    Text(
-                                        text = expense.label,
-                                        color = colorScheme.outline,
-                                        fontSize = 14.sp,
-                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily
-                                    )
                                 }
                                 IconButton(onClick = {
-                                    onEvent(ExpenseEvent.DeleteExpense(expense))
+                                    onEvent(ExpenseEvent.DeleteCategory(category))
                                 }) {
                                     Icon(
                                         imageVector = Icons.Outlined.Clear,
-                                        contentDescription = "Delete expense",
+                                        contentDescription = "Delete category",
                                         tint = colorScheme.outline,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -228,11 +203,15 @@ fun Expenses(
                             ),
                             modifier = Modifier
                                 .background(Color.Black)
-                                .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(20.dp))
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.secondary,
+                                    RoundedCornerShape(20.dp)
+                                )
                         ) {
                             TextField(
-                                value = label,
-                                onValueChange = { label = it },
+                                value = name,
+                                onValueChange = { name = it },
                                 textStyle = TextStyle.Default.copy(
                                     fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                                     fontSize = 16.sp
@@ -251,71 +230,21 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Outlined.Label,
-                                        contentDescription = "Label"
+                                        contentDescription = "Name"
                                     )
                                 }
                             )
-                            TextField(
-                                value = amount,
-                                onValueChange = { amount = it },
-                                label = {
-                                    Text(
-                                        text = "Amount",
-                                        modifier = modifier.background(Color.Transparent),
-                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
-                                    )
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedLabelColor = colorScheme.tertiary,
-                                    focusedIndicatorColor = colorScheme.tertiary,
-                                    cursorColor = colorScheme.secondary,
-                                    focusedContainerColor = colorScheme.secondary,
-                                    unfocusedContainerColor = colorScheme.background,
-                                ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
-                                singleLine = true,
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Payments,
-                                        contentDescription = "Amount"
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
-                            TextField(
-                                value = date,
-                                onValueChange = {date = it },
-                                label = {
-                                    Text(
-                                        text = "Date",
-                                        modifier = modifier.background(Color.Transparent),
-                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
-                                    )
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedLabelColor = colorScheme.tertiary,
-                                    focusedIndicatorColor = colorScheme.tertiary,
-                                    cursorColor = colorScheme.secondary,
-                                    focusedContainerColor = colorScheme.secondary,
-                                    unfocusedContainerColor = colorScheme.background,
-                                ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
-                                singleLine = true,
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.CalendarToday,
-                                        contentDescription = "Date"
-                                    )
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
                             Row(
-                                modifier = Modifier.background(Color.Black).padding(15.dp),
+                                modifier = Modifier
+                                    .background(Color.Black)
+                                    .padding(15.dp),
                                 horizontalArrangement = Arrangement.spacedBy(
                                     space = 10.dp,
                                     alignment = Alignment.CenterHorizontally
@@ -324,8 +253,8 @@ fun Expenses(
                                 Button(
                                     modifier = modifier.weight(1f),
                                     onClick = {
-                                        val newExpense = Expense(expenseId, label, amount, date)
-                                        onEvent(ExpenseEvent.UpdateExpense(newExpense))
+                                        val newCategory = Category(categoryId, name)
+                                        onEvent(ExpenseEvent.UpdateCategory(newCategory))
                                         showDialog.value = false
                                     }
                                 ) {
@@ -348,3 +277,4 @@ fun Expenses(
         }
     }
 }
+

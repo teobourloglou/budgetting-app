@@ -43,6 +43,8 @@ import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.components.DrawerContent
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -73,8 +75,8 @@ fun Home(
 
             var modalHidden by remember { mutableStateOf(false) }
             var selected by remember { mutableIntStateOf(0) }
-            var amountInteger by remember { mutableStateOf(totalAmount(state)[0].toInt().toString()) }
-            var amountDecimal by remember { mutableStateOf(((totalAmount(state)[0] - totalAmount(state)[0].toInt()) * 100).toInt().toString()) }
+            var amountInteger by remember { mutableStateOf( totalAmount(state)[0].toInt().toString() ) }
+            var amountDecimal by remember { mutableStateOf( String.format("%.2f", totalAmount(state)[0]).takeLast(2) ) }
 
             Row(
                 verticalAlignment = Alignment.Top,
@@ -116,7 +118,7 @@ fun Home(
                             .clickable {
                                 selected = 0
                                 amountInteger = totalAmount(state)[0].toInt().toString()
-                                amountDecimal = (totalAmount(state)[0] - totalAmount(state)[0].toInt()).toString()
+                                amountDecimal = String.format("%.2f", totalAmount(state)[0]).takeLast(2)
                                 modalHidden = true
                             },
                         textAlign = TextAlign.Center,
@@ -152,7 +154,7 @@ fun Home(
                         onClick = {
                             selected = 0
                             amountInteger = totalAmount(state)[0].toInt().toString()
-                            amountDecimal = (totalAmount(state)[0] - totalAmount(state)[0].toInt()).toString()
+                            amountDecimal = String.format("%.2f", totalAmount(state)[0]).takeLast(2)
                         },
                         colors = if (selected == 0) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary) else ButtonDefaults.buttonColors(
                             MaterialTheme.colorScheme.secondary),
@@ -169,7 +171,7 @@ fun Home(
                         onClick = {
                             selected = 1
                             amountInteger = totalAmount(state)[1].toInt().toString()
-                            amountDecimal = (totalAmount(state)[1] - totalAmount(state)[1].toInt()).toString()
+                            amountDecimal = String.format("%.2f", totalAmount(state)[1]).takeLast(2)
                         },
                         colors = if (selected == 1) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary) else ButtonDefaults.buttonColors(
                             MaterialTheme.colorScheme.secondary),
@@ -186,7 +188,7 @@ fun Home(
                         onClick = {
                             selected = 2
                             amountInteger = totalAmount(state)[2].toInt().toString()
-                            amountDecimal = (totalAmount(state)[2] - totalAmount(state)[2].toInt()).toString()
+                            amountDecimal = String.format("%.2f", totalAmount(state)[2]).takeLast(2)
                         },
                         colors = if (selected == 2) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary) else ButtonDefaults.buttonColors(
                             MaterialTheme.colorScheme.secondary),
@@ -307,6 +309,7 @@ fun calculateExpensesSum(expenses: List<Expense>, startDate: LocalDate, endDate:
             }
         }
         .sum()
+
 }
 
 

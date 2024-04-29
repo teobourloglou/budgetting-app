@@ -6,4 +6,8 @@
     <string name="year">YEAR</string>
     <string name="add_expense">ADD EXPENSE</string>
     <string name="expenses">EXPENSES</string>
+    <string name="categories">CATEGORIES</string>
+    <string name="add_category">ADD CATEGORY</string>
+    <string name="no_data">NO DATA</string>
+    <string name="back_home">BACK HOME</string>
 </resources>

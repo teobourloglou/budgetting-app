@@ -10,6 +10,8 @@ import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.expense.Expenses
 import com.example.budgettingapp.ui.Home
+import com.example.budgettingapp.ui.category.Categories
+import com.example.budgettingapp.ui.category.CategoryEntry
 import com.example.budgettingapp.ui.expense.ExpenseEntry
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -45,6 +47,24 @@ fun SetupNavGraph(
             route = Screen.ExpenseEntry.route
         ) {
             ExpenseEntry(
+                navController,
+                state,
+                onEvent,
+            )
+        }
+        composable(
+            route = Screen.Categories.route
+        ) {
+            Categories(
+                navController,
+                state,
+                onEvent
+            )
+        }
+        composable(
+            route = Screen.CategoryEntry.route
+        ) {
+            CategoryEntry(
                 navController,
                 state,
                 onEvent,

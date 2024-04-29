@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.budgettingapp.data.category.Category
 import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseDao
 import com.example.budgettingapp.data.expense.ExpenseEvent
@@ -14,10 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Date
-import java.util.Locale
 
 class ExpenseViewModel(
     private val dao: ExpenseDao
@@ -25,10 +23,12 @@ class ExpenseViewModel(
     @RequiresApi(Build.VERSION_CODES.O)
     private val _state = MutableStateFlow(ExpenseState())
     private val _expenses = dao.getAllExpensesByDate().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _categories = dao.getAllCategories().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     @RequiresApi(Build.VERSION_CODES.O)
-    val state = combine(_state, _expenses) { state, expenses ->
+    val state = combine(_state, _expenses, _categories) { state, expenses, categories ->
         state.copy(
-            expenses = expenses
+            expenses = expenses,
+            categories = categories
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExpenseState())
     @RequiresApi(Build.VERSION_CODES.O)
@@ -85,6 +85,42 @@ class ExpenseViewModel(
             is ExpenseEvent.SetDate -> {
                 _state.update { it.copy(
                     date = event.date
+                ) }
+            }
+
+            is ExpenseEvent.DeleteCategory -> {
+                viewModelScope.launch {
+                    dao.deleteCategory(event.category)
+                }
+            }
+
+            ExpenseEvent.SaveCategory -> {
+                val name = state.value.name
+
+                if (name.isBlank()) {
+                    return
+                }
+
+                val category = Category(
+                    name = name
+                )
+                viewModelScope.launch {
+                    dao.upsertCategory(category)
+                }
+                _state.update { it.copy(
+                    name = ""
+                ) }
+            }
+
+            is ExpenseEvent.UpdateCategory -> {
+                viewModelScope.launch {
+                    dao.upsertCategory(event.category)
+                }
+            }
+
+            is ExpenseEvent.SetName -> {
+                _state.update { it.copy(
+                    name = event.name
                 ) }
             }
         }
