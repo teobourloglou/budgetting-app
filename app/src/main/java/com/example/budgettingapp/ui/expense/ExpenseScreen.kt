@@ -1,7 +1,10 @@
 package com.example.budgettingapp.ui.expense
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,13 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,6 +61,7 @@ import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Expenses(
     navController: NavController,
@@ -131,6 +134,9 @@ fun Expenses(
                     }
                 }
                 var expenseId by remember { mutableIntStateOf(0) }
+                var label by remember { mutableStateOf("") }
+                var amount by remember { mutableStateOf("") }
+                var date by remember { mutableStateOf("") }
                 var previousDate by remember { mutableStateOf("") }
 
                 if (state.expenses.isEmpty()) {
@@ -152,7 +158,9 @@ fun Expenses(
                         items(state.expenses) { expense ->
 
                             if (previousDate != expense.date) {
-                                Row() {
+                                Row(
+                                    modifier = Modifier.padding(0.dp, 5.dp)
+                                ) {
                                     Text(expense.date)
                                 }
                             }
@@ -169,6 +177,9 @@ fun Expenses(
                                     .fillMaxWidth()
                                     .clickable {
                                         expenseId = expense.id
+                                        label = expense.label
+                                        amount = expense.amount
+                                        date = expense.date
                                         showDialog.value = true
                                     }
                             ) {
@@ -184,12 +195,6 @@ fun Expenses(
                                     )
                                     Text(
                                         text = expense.label,
-                                        color = colorScheme.outline,
-                                        fontSize = 14.sp,
-                                        fontFamily = MaterialTheme.typography.labelSmall.fontFamily
-                                    )
-                                    Text(
-                                        text = expense.date,
                                         color = colorScheme.outline,
                                         fontSize = 14.sp,
                                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily
@@ -211,13 +216,18 @@ fun Expenses(
                     }
                 }
                 if (showDialog.value) {
-                    var label by remember { mutableStateOf("") }
-                    var amount by remember { mutableStateOf("") }
-                    var date by remember { mutableStateOf("") }
-
-                    Dialog(onDismissRequest = { /*TODO*/ }) {
-                        Card() {
-                            Text(text = expenseId.toString())
+                    Dialog(
+                        onDismissRequest = { /*TODO*/ }
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 15.dp,
+                                alignment = Alignment.Bottom
+                            ),
+                            modifier = Modifier
+                                .background(Color.Black)
+                                .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(20.dp))
+                        ) {
                             TextField(
                                 value = label,
                                 onValueChange = { label = it },
@@ -239,7 +249,7 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -258,7 +268,14 @@ fun Expenses(
                                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                                     )
                                 },
-                                modifier = Modifier.fillMaxWidth(),
+                                colors = TextFieldDefaults.colors(
+                                    focusedLabelColor = colorScheme.tertiary,
+                                    focusedIndicatorColor = colorScheme.tertiary,
+                                    cursorColor = colorScheme.secondary,
+                                    focusedContainerColor = colorScheme.secondary,
+                                    unfocusedContainerColor = colorScheme.background,
+                                ),
+                                modifier = Modifier.fillMaxWidth().padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -278,29 +295,49 @@ fun Expenses(
                                         fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
                                     )
                                 },
-                                modifier = Modifier.fillMaxWidth(),
+                                colors = TextFieldDefaults.colors(
+                                    focusedLabelColor = colorScheme.tertiary,
+                                    focusedIndicatorColor = colorScheme.tertiary,
+                                    cursorColor = colorScheme.secondary,
+                                    focusedContainerColor = colorScheme.secondary,
+                                    unfocusedContainerColor = colorScheme.background,
+                                ),
+                                modifier = Modifier.fillMaxWidth().padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
-                                        imageVector = Icons.Outlined.Payments,
-                                        contentDescription = "Amount"
+                                        imageVector = Icons.Outlined.CalendarToday,
+                                        contentDescription = "Date"
                                     )
                                 },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
-                            //                            CustomDatePicker(
-                            //                                value = expense.date
-                            //                                onValueChange = {
-                            //                                    state.date = it
-                            //                                    ExpenseEvent.SetDate(state.date.toString())
-                            //                                }
-                            //                            )
-                            Button(onClick = {
-                                val newExpense = Expense(expenseId, label, amount, date)
-                                onEvent(ExpenseEvent.UpdateExpense(newExpense))
-                                showDialog.value = false
-                            }) {
-                                Text("Save")
+                            Row(
+                                modifier = Modifier.background(Color.Black).padding(15.dp),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    space = 10.dp,
+                                    alignment = Alignment.CenterHorizontally
+                                ),
+                            ) {
+                                Button(
+                                    modifier = modifier.weight(1f),
+                                    onClick = {
+                                        val newExpense = Expense(expenseId, label, amount, date)
+                                        onEvent(ExpenseEvent.UpdateExpense(newExpense))
+                                        showDialog.value = false
+                                    }
+                                ) {
+                                    Text("Save")
+                                }
+                                Button(
+                                    modifier = modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(colorScheme.background),
+                                    onClick = {
+                                        showDialog.value = false
+                                    }
+                                ) {
+                                    Text("Cancel")
+                                }
                             }
                         }
                     }
