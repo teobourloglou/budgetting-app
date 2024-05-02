@@ -6,4 +6,6 @@ sealed class Screen(val route: String) {
     object ExpenseEntry: Screen("expense_entry_screen")
     object Categories: Screen("category_screen")
     object CategoryEntry: Screen("category_entry_screen")
+    object Methods: Screen("method_screen")
+    object MethodEntry: Screen("method_entry_screen")
 }

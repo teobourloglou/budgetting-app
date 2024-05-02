@@ -13,6 +13,8 @@ import com.example.budgettingapp.ui.Home
 import com.example.budgettingapp.ui.category.Categories
 import com.example.budgettingapp.ui.category.CategoryEntry
 import com.example.budgettingapp.ui.expense.ExpenseEntry
+import com.example.budgettingapp.ui.method.MethodEntry
+import com.example.budgettingapp.ui.method.Methods
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -65,6 +67,24 @@ fun SetupNavGraph(
             route = Screen.CategoryEntry.route
         ) {
             CategoryEntry(
+                navController,
+                state,
+                onEvent,
+            )
+        }
+        composable(
+            route = Screen.Methods.route
+        ) {
+            Methods(
+                navController,
+                state,
+                onEvent
+            )
+        }
+        composable(
+            route = Screen.MethodEntry.route
+        ) {
+            MethodEntry(
                 navController,
                 state,
                 onEvent,

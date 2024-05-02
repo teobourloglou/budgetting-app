@@ -9,6 +9,7 @@ import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseDao
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
+import com.example.budgettingapp.data.expense.Method
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -24,11 +25,13 @@ class ExpenseViewModel(
     private val _state = MutableStateFlow(ExpenseState())
     private val _expenses = dao.getAllExpensesByDate().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     private val _categories = dao.getAllCategories().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    private val _methods = dao.getAllMethods().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     @RequiresApi(Build.VERSION_CODES.O)
-    val state = combine(_state, _expenses, _categories) { state, expenses, categories ->
+    val state = combine(_state, _expenses, _categories, _methods) { state, expenses, categories, methods ->
         state.copy(
             expenses = expenses,
-            categories = categories
+            categories = categories,
+            methods = methods
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExpenseState())
     @RequiresApi(Build.VERSION_CODES.O)
@@ -130,6 +133,48 @@ class ExpenseViewModel(
                 _state.update { it.copy(
                     categoryId = event.categoryId
                 ) }
+            }
+
+            ExpenseEvent.SaveMethod -> {
+                val payment = state.value.payment
+
+                if (payment.isBlank()) {
+                    return
+                }
+
+                val method = Method(
+                    payment = payment
+                )
+                viewModelScope.launch {
+                    dao.upsertMethod(method)
+                }
+                _state.update { it.copy(
+                    payment = ""
+                ) }
+            }
+
+            is ExpenseEvent.UpdateMethod -> {
+                viewModelScope.launch {
+                    dao.upsertMethod(event.method)
+                }
+            }
+
+            is ExpenseEvent.SetPayment -> {
+                _state.update { it.copy(
+                    payment = event.payment
+                ) }
+            }
+
+            is ExpenseEvent.SetMethodId -> {
+                _state.update { it.copy(
+                    methodId = event.methodId
+                ) }
+            }
+
+            is ExpenseEvent.DeleteMethod -> {
+                viewModelScope.launch {
+                    dao.deleteMethod(event.method)
+                }
             }
         }
     }

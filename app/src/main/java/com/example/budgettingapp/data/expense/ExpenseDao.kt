@@ -29,4 +29,14 @@ interface ExpenseDao {
     fun getCategory(id: Int): Flow<Category>
     @Query("SELECT * from categories")
     fun getAllCategories(): Flow<List<Category>>
+
+    //    Payment Method
+    @Upsert
+    suspend fun upsertMethod(method: Method)
+    @Delete
+    suspend fun deleteMethod(method: Method)
+    @Query("SELECT * from methods WHERE id = :id")
+    fun getMethod(id: Int): Flow<Method>
+    @Query("SELECT * from methods")
+    fun getAllMethods(): Flow<List<Method>>
 }

@@ -8,11 +8,14 @@ import java.time.format.DateTimeFormatter
 data class ExpenseState @RequiresApi(Build.VERSION_CODES.O) constructor(
     val expenses: List<Expense> = emptyList(),
     val categories: List<Category> = emptyList(),
+    val methods: List<Method> = emptyList(),
     val label: String = "",
     val amount: String = "",
     val date: String = currentDate(),
     val name: String = "",
-    val categoryId: Int = 0
+    val payment: String = "",
+    val categoryId: Int = 0,
+    val methodId: Int = 0
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
