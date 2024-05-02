@@ -201,11 +201,32 @@ fun Expenses(
                                         .padding(10.dp)
                                         .weight(1f)
                                 ) {
-                                    Text(
-                                        text = expense.amount,
-                                        color = colorScheme.outline,
-                                        fontSize = 20.sp
-                                    )
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(
+                                            space = 10.dp,
+                                            alignment = Alignment.CenterHorizontally
+                                        )
+                                    ) {
+                                        Text(
+                                            text = expense.amount,
+                                            color = colorScheme.outline,
+                                            fontSize = 24.sp
+                                        )
+                                        val categoryName = state.categories.find { it.id == expense.categoryId }?.name
+                                        if (categoryName != null) {
+                                            Text(
+                                                text = categoryName,
+                                                color = Color.White,
+                                                fontSize = 14.sp,
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = MaterialTheme.colorScheme.primary,
+                                                        shape = RoundedCornerShape(30.dp)
+                                                    )
+                                                    .padding(10.dp, 4.dp)
+                                            )
+                                        }
+                                    }
                                     Text(
                                         text = expense.label,
                                         color = colorScheme.outline,
@@ -239,7 +260,11 @@ fun Expenses(
                             ),
                             modifier = Modifier
                                 .background(Color.Black)
-                                .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(20.dp))
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.secondary,
+                                    RoundedCornerShape(20.dp)
+                                )
                         ) {
                             TextField(
                                 value = label,
@@ -262,7 +287,9 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -288,7 +315,9 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -315,7 +344,9 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -416,7 +447,9 @@ fun Expenses(
                                     focusedContainerColor = colorScheme.secondary,
                                     unfocusedContainerColor = colorScheme.background,
                                 ),
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
                                 singleLine = true,
                                 leadingIcon = {
                                     Icon(
@@ -427,7 +460,9 @@ fun Expenses(
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                             )
                             Row(
-                                modifier = Modifier.background(Color.Black).padding(15.dp),
+                                modifier = Modifier
+                                    .background(Color.Black)
+                                    .padding(15.dp),
                                 horizontalArrangement = Arrangement.spacedBy(
                                     space = 10.dp,
                                     alignment = Alignment.CenterHorizontally
