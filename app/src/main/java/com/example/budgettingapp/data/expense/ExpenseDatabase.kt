@@ -3,7 +3,6 @@ package com.example.budgettingapp.data.expense
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.budgettingapp.data.category.Category
 
 //@Database(
 //    version = 1,
@@ -25,13 +24,13 @@ import com.example.budgettingapp.data.category.Category
 //}
 
 @Database(
-    version = 3,
+    version = 4,
     entities = [
         Expense::class,
         Category::class
    ],
     autoMigrations = [
-        AutoMigration (from = 2, to = 3)
+        AutoMigration (from = 3, to = 4)
     ]
 )
 abstract class ExpenseDatabase : RoomDatabase() {

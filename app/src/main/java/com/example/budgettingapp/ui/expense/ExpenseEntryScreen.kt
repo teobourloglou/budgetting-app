@@ -1,50 +1,65 @@
 package com.example.budgettingapp.ui.expense
 
+import android.content.res.Configuration
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
-import com.example.budgettingapp.data.expense.Expense
+import com.example.budgettingapp.data.expense.Category
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
-import com.example.budgettingapp.data.expense.currentDate
 import com.example.budgettingapp.ui.ScreenContent
 import com.example.budgettingapp.ui.components.DrawerContent
+import com.example.budgettingapp.ui.theme.BudgettingAppTheme
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -53,6 +68,7 @@ import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpenseEntry(
@@ -74,8 +90,6 @@ fun ExpenseEntry(
             title = stringResource(R.string.add_expense),
             modifier = modifier.padding(5.dp)
         ) {
-            val date = remember { mutableStateOf(LocalDate.now()) }
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(
                     space = 40.dp,
@@ -154,6 +168,81 @@ fun ExpenseEntry(
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
+                var expanded by remember { mutableStateOf(false) }
+                val context = LocalContext.current
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = {
+                            expanded = !expanded
+                        }
+                    ) {
+                        TextField(
+                            value = state.categories.find { it.id == state.categoryId }?.name ?: "",
+                            onValueChange = {
+                                val newValue = it
+                                state.categories.forEach() {
+                                    if (it.name == newValue) {
+                                        onEvent(
+                                            ExpenseEvent.SetCategoryId(it.id)
+                                        )
+                                    }
+                                }
+                            },
+                            readOnly = true,
+                            label = {
+                                Text(
+                                    text = "Category",
+                                    modifier = modifier.background(Color.Transparent),
+                                    fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+                                )
+                            },
+                            colors = TextFieldDefaults.colors(
+                                focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                                focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                                cursorColor = MaterialTheme.colorScheme.secondary,
+                                focusedContainerColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                            ),
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.ArrowDropDown,
+                                    contentDescription = "Down"
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.Category,
+                                    contentDescription = "Category"
+                                )
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .background(Color.Black)
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            state.categories.forEach { item ->
+                                DropdownMenuItem(
+                                    text = { Text(text = item.name) },
+                                    onClick = {
+                                        onEvent(ExpenseEvent.SetCategoryId(item.id))
+                                        expanded = false
+                                        Toast.makeText(context, item.name, Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
                 TextField(
                     value = state.date,
                     onValueChange = {
@@ -189,13 +278,6 @@ fun ExpenseEntry(
                         Text(text = "yyyy-MM-dd")
                     }
                 )
-//                CustomDatePicker(
-//                    value = state.date,
-//                    onValueChange = {
-//                        date.value = it
-//                        ExpenseEvent.SetDate(date.value.toString())
-//                    }
-//                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(
                         space = 5.dp,
@@ -237,64 +319,69 @@ fun ExpenseEntry(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomDatePicker(
-    value: String,
-    onValueChange: (LocalDate) -> Unit
-) {
+fun Demo_ExposedDropdownMenuBox(categories : List<Category>) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf(categories[0].name) }
 
-    val open = remember { mutableStateOf(false)}
-
-    if (open.value) {
-        CalendarDialog(
-            state = rememberUseCaseState(visible = true, true, onCloseRequest = { open.value = false } ),
-            config = CalendarConfig(
-                yearSelection = true,
-                style = CalendarStyle.MONTH,
-            ),
-            selection = CalendarSelection.Date(
-                selectedDate = LocalDate.parse(value, DateTimeFormatter.ISO_DATE)
-            ) { newDate ->
-                onValueChange(newDate)
-            },
-        )
-    }
-
-    TextField(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                open.value = true
-            },
-        enabled = false,
-        value = value.format(DateTimeFormatter.ISO_DATE) ,
-        onValueChange = {},
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-            disabledBorderColor = MaterialTheme.colorScheme.outline,
-            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.CalendarToday,
-                contentDescription = "Date"
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedText,
+                onValueChange = {
+                    val newValue = it
+                    categories.forEach() {
+                        if (it.name == newValue) {
+                            ExpenseEvent.SetCategoryId(it.id)
+                        }
+                    }
+                },
+                readOnly = true,
+                colors = TextFieldDefaults.colors(
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    cursorColor = MaterialTheme.colorScheme.secondary,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                ),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Category,
+                        contentDescription = "Category"
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .background(Color.Black)
             )
-        },
-        textStyle = TextStyle.Default.copy(
-            fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
-            fontSize = 16.sp
-        ),
-        label = {
-            Text(
-                text = "Date",
-                modifier = Modifier.background(Color.Transparent),
-                fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
-            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                categories.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item.name) },
+                        onClick = {
+                            selectedText = item.name
+                            expanded = false
+                            Toast.makeText(context, item.name, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            }
         }
-    )
+    }
 }

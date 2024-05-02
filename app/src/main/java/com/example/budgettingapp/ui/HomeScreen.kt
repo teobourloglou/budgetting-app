@@ -280,17 +280,12 @@ fun totalAmount(
     val currentDate = LocalDate.now()
 
     val startOfWeek = currentDate.minusDays(6)
-    val endOfWeek = currentDate
+    val startOfMonth = currentDate.minusDays(30)
+    val startOfYear = currentDate.minusDays(365)
 
-    val startOfMonth = currentDate.withDayOfMonth(1)
-    val endOfMonth = startOfMonth.plusMonths(1).minusDays(1)
-
-    val startOfYear = currentDate.withDayOfYear(1)
-    val endOfYear = startOfYear.plusYears(1).minusDays(1)
-
-    val weekSum = calculateExpensesSum(state.expenses, startOfWeek, endOfWeek)
-    val monthSum = calculateExpensesSum(state.expenses, startOfMonth, endOfMonth)
-    val yearSum = calculateExpensesSum(state.expenses, startOfYear, endOfYear)
+    val weekSum = calculateExpensesSum(state.expenses, startOfWeek, currentDate)
+    val monthSum = calculateExpensesSum(state.expenses, startOfMonth, currentDate)
+    val yearSum = calculateExpensesSum(state.expenses, startOfYear, currentDate)
 
     return arrayOf(weekSum, monthSum, yearSum)
 }
@@ -309,7 +304,6 @@ fun calculateExpensesSum(expenses: List<Expense>, startDate: LocalDate, endDate:
             }
         }
         .sum()
-
 }
 
 

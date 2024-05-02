@@ -1,12 +1,11 @@
 package com.example.budgettingapp.data.expense
 
-import com.example.budgettingapp.data.category.Category
-
 sealed interface ExpenseEvent {
     object SaveExpense: ExpenseEvent
     data class SetLabel(val label: String): ExpenseEvent
     data class SetAmount(val amount: String): ExpenseEvent
     data class SetDate(val date: String): ExpenseEvent
+    data class SetCategoryId(val categoryId: Int): ExpenseEvent
     data class DeleteExpense(val expense: Expense): ExpenseEvent
     data class UpdateExpense(val expense: Expense): ExpenseEvent
 

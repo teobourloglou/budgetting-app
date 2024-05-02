@@ -2,7 +2,6 @@ package com.example.budgettingapp.data.expense
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.budgettingapp.data.category.Category
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -12,7 +11,8 @@ data class ExpenseState @RequiresApi(Build.VERSION_CODES.O) constructor(
     val label: String = "",
     val amount: String = "",
     val date: String = currentDate(),
-    val name: String = ""
+    val name: String = "",
+    val categoryId: Int = 0
 )
 
 @RequiresApi(Build.VERSION_CODES.O)

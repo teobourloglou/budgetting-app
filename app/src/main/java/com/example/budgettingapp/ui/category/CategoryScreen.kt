@@ -1,6 +1,5 @@
 package com.example.budgettingapp.ui.category
 
-import com.example.budgettingapp.data.category.Category
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -51,6 +50,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.budgettingapp.R
 import com.example.budgettingapp.Screen
+import com.example.budgettingapp.data.expense.Category
 import com.example.budgettingapp.data.expense.ExpenseEvent
 import com.example.budgettingapp.data.expense.ExpenseState
 import com.example.budgettingapp.ui.ScreenContent

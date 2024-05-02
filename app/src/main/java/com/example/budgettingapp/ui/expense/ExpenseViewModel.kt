@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.budgettingapp.data.category.Category
+import com.example.budgettingapp.data.expense.Category
 import com.example.budgettingapp.data.expense.Expense
 import com.example.budgettingapp.data.expense.ExpenseDao
 import com.example.budgettingapp.data.expense.ExpenseEvent
@@ -44,6 +44,7 @@ class ExpenseViewModel(
                 val label = state.value.label
                 val amount = state.value.amount
                 val date = state.value.date
+                val categoryId = state.value.categoryId
 
                 if (label.isBlank() || amount.isBlank()) {
                     return
@@ -52,7 +53,8 @@ class ExpenseViewModel(
                 val expense = Expense(
                     label = label,
                     amount = amount,
-                    date = date
+                    date = date,
+                    categoryId = categoryId
                 )
                 viewModelScope.launch {
                     dao.upsertExpense(expense)
@@ -121,6 +123,12 @@ class ExpenseViewModel(
             is ExpenseEvent.SetName -> {
                 _state.update { it.copy(
                     name = event.name
+                ) }
+            }
+
+            is ExpenseEvent.SetCategoryId -> {
+                _state.update { it.copy(
+                    categoryId = event.categoryId
                 ) }
             }
         }
